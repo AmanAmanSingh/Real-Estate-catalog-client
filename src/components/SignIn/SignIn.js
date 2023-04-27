@@ -1,9 +1,47 @@
 import React from "react"
 import { useState } from "react"
 import "./SignIn.css"
+import { Link, Navigate, useNavigate } from "react-router-dom"
+
+
 const SignIn = () => {
-    const [userid, setuserid] = useState("")
-    const [password, setpassword] = useState("")
+    const navigate = useNavigate()
+    const [userdetail, setuserdetail] = useState({ email: "", password: "", });
+    const [err, setError] = useState("");
+
+    const handlechange = (e) => {
+        setuserdetail({ ...userdetail, [e.target.name]: e.target.value })
+    }
+
+    const handlesubmit = async (e) => {
+        e.preventDefault();
+        setError("verfying...");
+
+        const data = await fetch(`http://localhost:8081/signin`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userdetail),
+        }).then((data) => {
+            return data.json()
+        }).then((response) => {
+            if (response.status == "failed") {
+                setError(response.message)
+            } else {
+                localStorage.setItem("authtoken", response.token);
+                localStorage.setItem("id", response.id);
+                localStorage.setItem("role", response.role);
+                navigate("/propertylist")
+            }
+        }).catch(e => {
+            // console.log(e, "e")
+            setError("credentials not Match")
+            navigate("/")
+        })
+    }
+
 
     return (
         <>
@@ -12,43 +50,42 @@ const SignIn = () => {
                     <h1 id="heading">Logo</h1>
                     <h6 id="heading-2">Enter Your Credentials To access your Account</h6>
                     <div id="Signin-form">
-                        <form >
+                        <form onSubmit={handlesubmit}>
                             <div><input
                                 className="Signin-input"
-                                type="text"
-                                placeholder="User ID"
-                                value={userid}
-                                onChange={(e) => setuserid(e.target.value)}
+                                type="email"
+                                placeholder="email"
+                                name="email"
+                                onChange={handlechange}
+                                required
                             /></div>
                             <div><input
                                 className="Signin-input"
                                 type="password"
                                 placeholder="Password"
-                                value={password}
-                                onChange={(e) => setpassword(e.target.value)}
-
+                                name="password"
+                                onChange={handlechange}
+                                required
                             /></div>
                             <div>
-                                <input
-                                    className="Signin-input"
-                                    id="button-signin"
-                                    type="Submit"
-                                   
-                                />
+                                <button className="Signin-input" id="button-signin" type="submit">Sign In</button>
                                 <div id="Signup">
-                                    <a href="/SignUp">Sign Up</a>
+                                    <Link to="/signup">Sign Up</Link>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                <div id="noaccount"><h4>Don't have an Account ?  <a href="/SignUp"> Sign Up</a>
+                <div id="error-message">
+                    <center> {err && <h5 style={{ color: "darkGreen" }}>{err}</h5>}</center>
+                </div>
+                <div id="noaccount"><h4>Don't have an Account ? <Link to="/signup"> Sign Up</Link>
                 </h4>
                 </div>
-
             </div>
 
         </>
     )
 }
 export default SignIn
+
