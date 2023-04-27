@@ -1,46 +1,10 @@
 import React from "react"
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
 import "./SignUp.css"
-// const url = "http://localhost:8080"
 const SignUp = () => {
-    const [userdetail, setuserdetail] = useState({
-        email: "",
-        password: "",
-        confirmpassword: ""
-    })
-    const [err, setError] = useState("")
-    const navigate = useNavigate();
-
-    const handlechange = (e) => {
-        setuserdetail({ ...userdetail, [e.target.name]: e.target.value })
-    }
-    const handlesubmit = async (e) => {
-        e.preventDefault();
-
-        setError("verfying...");
-        // https://real-estate-server-o2q8.onrender.com/signup
-        const data = await fetch(`http://localhost:8080/signup`, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userdetail),
-        }).then((data) => {
-            return data.json();
-        }).then(data => {
-            console.log(data);
-            if (data.status == "failed") {
-                setError(data.message);
-            } else {
-                navigate("/");
-            }
-        }).catch(e => {
-            console.log(e)
-        })
-    };
-
+    const [email, setemail] = useState("")
+    const [password, setpassword] = useState("")
+    const [cnfpassword, setcnfpassword] = useState("")
     return (
         <>
             <div>
@@ -48,47 +12,47 @@ const SignUp = () => {
                     <h1 id="heading">Logo</h1>
                     <h6 id="heading-2">Create New Account</h6>
                     <div id="Signup-form">
-                        <form onSubmit={handlesubmit}>
-                            <div><input
+                        <form >
+                        <div><input
                                 className="Signup-input"
                                 type="email"
                                 placeholder="Email ID"
-                                name="email"
-                                onChange={handlechange}
-                                required
+                                value={email}
+                                onChange={(e) => setemail(e.target.value)}
                             /></div>
                             <div><input
                                 className="Signup-input"
                                 type="password"
                                 placeholder="Password"
-                                name="password"
-                                onChange={handlechange}
-                                required
+                                value={password}
+                                onChange={(e) => setpassword(e.target.value)}
                             /></div>
                             <div><input
                                 className="Signup-input"
                                 type="password"
                                 placeholder="Confirm Password"
-                                name="confirmpassword"
-                                onChange={handlechange}
-                                required
+                                value={cnfpassword}
+                                onChange={(e) => setcnfpassword(e.target.value)}
+
                             /></div>
                             <div>
-                                <button className="Signup-input"
-                                    id="button-signup" type="submit">Sign Up</button>
+                                <input
+                                    className="Signup-input"
+                                    id="button-signup"
+                                    type="Submit"
+                                    value="Sign Up"
+                                />
                             </div>
                         </form>
                     </div>
                 </div>
-                <div id="error-message">
-                    <center> {err && <h5 style={{ color: "darkGreen" }} >{err}</h5>}</center>
-                </div>
-                <div id="noaccount"><h4><Link to="/">Sign In</Link>
+                <div id="noaccount"><h4><a href="/"> Sign In</a>
                 </h4>
                 </div>
+
             </div>
 
         </>
     )
 }
-export default SignUp;
+export default SignUp
